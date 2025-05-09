@@ -3,6 +3,7 @@ package cobrosapp.ui;
 import interfaces.PagarMesSeleccionado;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.MouseAdapter;
@@ -20,18 +21,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import logica.Metodos;
 import pojo.Cliente;
-import pojo.Mes;
 
 /**
  *
@@ -44,27 +48,25 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();
-        listModel = new DefaultListModel<>();        
+        listModel = new DefaultListModel<>();
         listaSugerencia = new JList<>(listModel);
         listaSugerencia.setFont(new Font("Arial", Font.BOLD, 14));
         pupoSugerencia = new JPopupMenu();
-        panelDePago.setVisible(false);
         panelPagoOtrosMeses.setVisible(false);
         listaSugerencia.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+
         pupoSugerencia.setLayout(new BorderLayout());
         pupoSugerencia.add(new JScrollPane(listaSugerencia), BorderLayout.CENTER);
         listaSugerencia.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 inputSearchField.setText(listaSugerencia.getSelectedValue().getNombre());
-                pupoSugerencia.setVisible(false);                
+                pupoSugerencia.setVisible(false);
                 panelPagoOtrosMeses.setVisible(true);
                 panelPintarMeses.removeAll();
-                mostrarDatosDeCliente();
             }
         });
     }
-    
+
     private JList<Cliente> listaSugerencia;
     private DefaultListModel<Cliente> listModel;
     private JPopupMenu pupoSugerencia;
@@ -81,12 +83,6 @@ public class Main extends javax.swing.JFrame {
         buttonGroup2 = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel1 = new javax.swing.JPanel();
-        jPanel3 = new javax.swing.JPanel();
-        panelDePago = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
-        montoAPagar = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        mensajeSiPagoOno = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         panelPagoOtrosMeses = new javax.swing.JPanel();
         jButton3 = new javax.swing.JButton();
@@ -109,74 +105,6 @@ public class Main extends javax.swing.JFrame {
         jTabbedPane1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 
         jPanel1.setBackground(new Color(0xEAECEE));
-
-        jPanel3.setBackground(new Color(0xD6DBDF));
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos mes actual", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
-
-        panelDePago.setBackground(new Color(0xD6DBDF));
-
-        jButton2.setBackground(new Color(0x2471A3));
-        jButton2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Realizar pago del mes");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        montoAPagar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-
-        jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Cantidad $:");
-
-        javax.swing.GroupLayout panelDePagoLayout = new javax.swing.GroupLayout(panelDePago);
-        panelDePago.setLayout(panelDePagoLayout);
-        panelDePagoLayout.setHorizontalGroup(
-            panelDePagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelDePagoLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(panelDePagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)
-                    .addComponent(montoAPagar))
-                .addGap(214, 214, 214)
-                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        panelDePagoLayout.setVerticalGroup(
-            panelDePagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelDePagoLayout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panelDePagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton2)
-                    .addComponent(montoAPagar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
-
-        mensajeSiPagoOno.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(mensajeSiPagoOno, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(panelDePago, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(mensajeSiPagoOno, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(panelDePago, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
 
         jPanel4.setBackground(new Color(0xD6DBDF));
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Pagos de otros meses", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 14))); // NOI18N
@@ -203,7 +131,7 @@ public class Main extends javax.swing.JFrame {
         );
         panelPintarMesesLayout.setVerticalGroup(
             panelPintarMesesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 67, Short.MAX_VALUE)
+            .addGap(0, 296, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout panelPagoOtrosMesesLayout = new javax.swing.GroupLayout(panelPagoOtrosMeses);
@@ -226,7 +154,7 @@ public class Main extends javax.swing.JFrame {
                 .addComponent(jButton3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelPintarMeses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -242,7 +170,7 @@ public class Main extends javax.swing.JFrame {
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addComponent(panelPagoOtrosMeses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 23, Short.MAX_VALUE))
+                .addGap(0, 29, Short.MAX_VALUE))
         );
 
         jButton1.setBackground(new Color(0x2471A3));
@@ -282,7 +210,6 @@ public class Main extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(inputSearchField, javax.swing.GroupLayout.PREFERRED_SIZE, 248, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -306,11 +233,9 @@ public class Main extends javax.swing.JFrame {
                     .addComponent(selectCodigo)
                     .addComponent(jRadioButton3)
                     .addComponent(jButton1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Cobros", jPanel1);
@@ -323,7 +248,7 @@ public class Main extends javax.swing.JFrame {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 437, Short.MAX_VALUE)
+            .addGap(0, 455, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Adeudos", jPanel2);
@@ -352,7 +277,7 @@ public class Main extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
 
         jTabbedPane1.getAccessibleContext().setAccessibleName("Cobros");
@@ -362,11 +287,11 @@ public class Main extends javax.swing.JFrame {
 
     private void inputSearchFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_inputSearchFieldKeyPressed
         ArrayList<Cliente> lista = new ArrayList();
-        Cliente cliente;        
+        Cliente cliente;
         String buscarPor = "";
         try {
             if (!inputSearchField.getText().isEmpty()) {
-                buscarPor = selectCodigo.isSelected() ? "numero" : "nombre";                
+                buscarPor = selectCodigo.isSelected() ? "numero" : "nombre";
                 ResultSet resultado = Metodos.consultaLike(buscarPor, inputSearchField.getText());
                 while (resultado.next()) {
                     cliente = new Cliente(
@@ -376,7 +301,7 @@ public class Main extends javax.swing.JFrame {
                     );
                     lista.add(cliente);
                 }
-                
+
                 mostrarSugerencias(lista);
             }
         } catch (SQLException ex) {
@@ -386,156 +311,185 @@ public class Main extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         inputSearchField.setText("");
-        mensajeSiPagoOno.setText("");
-        panelDePago.setVisible(false);
         panelPagoOtrosMeses.setVisible(false);
     }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (!montoAPagar.getText().isEmpty()) {
-            double totalAPagar = Double.parseDouble(montoAPagar.getText());
-            int idClienteSeleccionado = listaSugerencia.getSelectedValue().getId();
-            Date fechaPago = Date.valueOf(LocalDate.now());
-            Time horaPago = Time.valueOf(LocalTime.now());
-            String periodo = getPeriodo();
-            
-            try {
-                Metodos.insertarPago(fechaPago, horaPago, idClienteSeleccionado, totalAPagar, periodo);
-            } catch (SQLException ex) {
-                System.err.println("Error al registrar pago " + ex.getMessage());
-            }
-            
-            mostrarDatosDeCliente();
-            if (panelPintarMeses.isVisible()) {
-                recargarMesesPanel();
-            }
-        }
-        
-    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         recargarMesesPanel();
     }//GEN-LAST:event_jButton3ActionPerformed
-    
+
     public void recargarMesesPanel() {
-        int idClienteSeleccionado = listaSugerencia.getSelectedValue().getId();
-        List<Mes> noPagadosYPagados = Metodos.obtenerMesesNoPagadosDeUnCliente(
-                idClienteSeleccionado,
-                YearMonth.now().getYear() + ""
-        );
-        
-        pintarMesesPagadosyNoPagados(noPagadosYPagados,
-                (fecha, hora, idCliente, monto, periodo) -> {
-                    System.out.println("Monto " + monto);
-                    try {
-                        Metodos.insertarPago(fecha, hora, idCliente, monto, periodo);
-                    } catch (SQLException ex) {
-                        System.err.println("Error al intentar registrar pago " + ex.getMessage());
-                    }
-                    recargarMesesPanel();
-                    mostrarDatosDeCliente();
-                }
-        );
-    }
-    
-    public void pintarMesesPagadosyNoPagados(List<Mes> noPagadosYPagados, PagarMesSeleccionado pagarMesI) {
-        panelPintarMeses.setLayout(new GridLayout(0, 3, 10, 10));
+        panelPintarMeses.setVisible(true);
         panelPintarMeses.removeAll();
-        
-        for (Mes mes : noPagadosYPagados) {
-            YearMonth ym = YearMonth.parse(mes.getPeriodo());
-            String nombreMes = ym.getMonth().getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
-            
-            if (mes.isPagado()) {
-                JButton btn = new JButton(nombreMes);
-                btn.setForeground(Color.WHITE);
-                btn.setFont(new Font("Arial", Font.BOLD, 14));
-                btn.setBackground(new Color(0x2E8B57));
-                panelPintarMeses.add(btn);
-                panelPintarMeses.updateUI();
-            } else {
-                JButton btn = new JButton(nombreMes);
-                btn.setBackground(new Color(0xB03A2E));
-                btn.setForeground(Color.WHITE);
-                btn.setFont(new Font("Arial", Font.BOLD, 14));
-                panelPintarMeses.add(btn);
-                panelPintarMeses.updateUI();
-                
-                btn.addActionListener(e -> {
-                    String confirm = JOptionPane.showInputDialog(
-                            this,
-                            "Ingrese la cantidad a pagar para el mes de " + nombreMes + ":",
-                            "Registrar pago",
-                            JOptionPane.PLAIN_MESSAGE);
-                    double monto = 0.0;
-                    if (confirm != null && !confirm.trim().isEmpty()) {
+        panelPintarMeses.setLayout(new BorderLayout());
+        int idClienteSeleccionado = listaSugerencia.getSelectedValue().getId();
+        ResultSet noPagadosYPagados = null;
+        try {
+            noPagadosYPagados = Metodos.obtenerMesesNoPagadosDeUnCliente(
+                    idClienteSeleccionado,
+                    YearMonth.now().getYear()
+            );
+        } catch (SQLException ex) {
+            System.err.println("Error al obtener pagos y tomas de los meses " + ex.getMessage());
+        }
+
+        pintarMesesPagadosyNoPagados(noPagadosYPagados);
+    }
+
+    public DefaultTableModel getTableModel() {
+        return new DefaultTableModel(new Object[]{"Mes", "Toma", "Estado", "Acción", "ID_toma"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return column == 3;
+            }
+        };
+    }
+
+    public void pintarMesesPagadosyNoPagados(ResultSet rs) {
+        DefaultTableModel model = getTableModel();
+        try {
+            while (rs.next()) {
+                int mes = rs.getInt("mes");
+                String mesNombre = Metodos.obtenerNombreMes(mes).toUpperCase();
+                String toma = rs.getString("id_toma");//identenficador de pago
+                String estado = rs.getString("estado");
+                int numToma = rs.getInt("numero_toma");
+                Object accion = estado.equalsIgnoreCase("No Pagado") ? "Pagar" : null;
+
+                model.addRow(new Object[]{mesNombre, numToma, estado, accion, toma});
+            }
+            rs.close();
+        } catch (SQLException ex) {
+            System.err.println("Error al obtener los campos de pagos y tomas " + ex.getMessage());
+        }
+
+        JTable tabla = getTable(model);
+        //tabla.getColumnModel().getColumn(2).setCellRenderer(new EstadoPagoRenderer());
+        JScrollPane scrollPane = new JScrollPane(tabla);
+        panelPintarMeses.add(scrollPane, BorderLayout.CENTER);
+        panelPintarMeses.repaint();
+        panelPintarMeses.updateUI();
+    }
+
+    public JTable getTable(DefaultTableModel model) {
+        JTable tabla = new JTable(model);
+
+        // Renderer de color para la columna Estado
+        tabla.getColumnModel().getColumn(2).setCellRenderer(new EstadoPagoRenderer());
+
+        // Ocultar la columna ID_Toma
+        tabla.getColumnModel().getColumn(4).setMinWidth(0);
+        tabla.getColumnModel().getColumn(4).setMaxWidth(0);
+        tabla.getColumnModel().getColumn(4).setWidth(0);
+        // Renderer para botón
+        tabla.getColumn("Acción").setCellRenderer(new TableCellRenderer() {
+            private final JButton boton = new JButton("Pagar");
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                if (value != null) {
+                    //boton.setText("Pagar");
+                    boton.setBackground(new Color(0x2471A3));
+                    boton.setForeground(Color.WHITE);
+                    return boton;
+                } else {
+                    return new JLabel(); // Celda vacía si ya está pagado
+                }
+            }
+        });
+        tabla = getColumnAction(tabla);
+        return tabla;
+    }
+
+    public JTable getColumnAction(JTable tabla) {
+        tabla.getColumn("Acción").setCellEditor(new DefaultCellEditor(new JCheckBox()) {
+            private final JButton boton = new JButton("Pagar");
+
+            {
+                boton.addActionListener(e -> {
+                    int fila = tabla.getSelectedRow();
+                    String mes = (String) tabla.getValueAt(fila, 0);
+                    String toma = (String) tabla.getValueAt(fila, 4);
+
+                    String montoStr = (String)JOptionPane.showInputDialog(
+                            tabla,
+                            "Ingrese el monto a pagar para Toma " + toma + " en " + mes,
+                            "",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            null,
+                            Metodos.getMontoMensual());
+                    
+                    if (montoStr != null) {
                         try {
-                            monto = Double.parseDouble(confirm);
+                            double monto = Double.parseDouble(montoStr);
                             Date fechaPago = Date.valueOf(LocalDate.now());
                             Time horaPago = Time.valueOf(LocalTime.now());
-                            
-                            pagarMesI.pagarMes(
-                                    fechaPago,
-                                    horaPago,
-                                    listaSugerencia.getSelectedValue().getId(),
-                                    monto,
-                                    mes.getPeriodo()
+
+                            boolean estado = Metodos.validarCobroCorrecto(
+                                    Integer.parseInt(toma),
+                                    listaSugerencia.getSelectedValue().getId()
                             );
+
+                            if (estado) {
+                                int mesNombre = Metodos.obtenerNumeroMes(mes);
+                                String periodo = LocalDate.now().getYear() + "-" + String.format("%02d", mesNombre);
+
+                                try {
+                                    Metodos.insertarPago(
+                                            fechaPago,
+                                            horaPago,
+                                            Integer.parseInt(toma),
+                                            monto,
+                                            periodo
+                                    );
+                                    JOptionPane.showMessageDialog(tabla, "Pago registrado exitosamente.");
+                                } catch (SQLException ex) {
+                                    System.err.println("Error al registar pago " + ex.getMessage());
+                                }
+                                recargarMesesPanel();
+                            } else {
+                                JOptionPane.showMessageDialog(tabla, "Hubo un error al realizar el pago.\n"
+                                        + "Intente limpiar e intentar de nuevo.",
+                                        "Error",
+                                        2);
+                            }
                         } catch (NumberFormatException ex) {
-                            System.err.println("Error al leer el monto a pagar " + ex.getMessage());
+                            JOptionPane.showMessageDialog(tabla, "Monto inválido");
                         }
                     }
-                    
                 });
-                
             }
-            
-        }
+
+            @Override
+            public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                return boton;
+            }
+
+            @Override
+            public Object getCellEditorValue() {
+                return "Pagar";
+            }
+        });
+        return tabla;
     }
-    
+
     public void mostrarSugerencias(ArrayList<Cliente> lista) {
         listModel.clear();
         lista.forEach(e -> {
             listModel.addElement(e);
         });
-        
+
         if (!lista.isEmpty()) {
             listaSugerencia.setSelectedIndex(0);
             pupoSugerencia.show(inputSearchField, 0, inputSearchField.getHeight());
             inputSearchField.requestFocus();
-            
+
         } else {
             pupoSugerencia.setVisible(false);
         }
     }
-    
-    public void mostrarDatosDeCliente() {
-        int idClienteSeleccionado = listaSugerencia.getSelectedValue().getId();
-        
-        try {
-            ResultSet pagoMensual
-                    = Metodos.consultaPagoMensual(idClienteSeleccionado, getPeriodo());
-            if (pagoMensual.next()) {
-                int pago = pagoMensual.getInt("pagos_realizados");
-                if (pago > 0) {
-                    mensajeSiPagoOno.setForeground(Color.green.darker());
-                    mensajeSiPagoOno.setText("Pagado");
-                    panelDePago.setVisible(false);
-                } else {
-                    mensajeSiPagoOno.setForeground(Color.RED.darker());
-                    mensajeSiPagoOno.setText("No ha pagado mes actual");
-                    panelDePago.setVisible(true);
-                }
-            } else {
-                mensajeSiPagoOno.setForeground(Color.RED.darker());
-                mensajeSiPagoOno.setText("No ha pagado mes actual");
-                panelDePago.setVisible(true);
-            }
-        } catch (SQLException ex) {
-            System.err.println("Error al consultar pago mensual " + ex.getMessage());
-        }
-    }
-    
+
     public String getPeriodo() {
         YearMonth actual = YearMonth.now();
         return actual.toString();
@@ -580,21 +534,15 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JTextField inputSearchField;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JRadioButton jRadioButton3;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JLabel mensajeSiPagoOno;
-    private javax.swing.JTextField montoAPagar;
-    private javax.swing.JPanel panelDePago;
     private javax.swing.JPanel panelPagoOtrosMeses;
     private javax.swing.JPanel panelPintarMeses;
     private javax.swing.JRadioButton selectCodigo;

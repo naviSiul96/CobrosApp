@@ -7,14 +7,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Time;
+import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import pojo.Mes;
-
 
 /**
  *
@@ -44,92 +46,95 @@ public class Metodos {
         return consulta(sql);
     }
 
-    public static ResultSet consultaPagoMensual(int idCliente, String periodo) throws SQLException {
-        String sql = "SELECT COUNT(*) AS pagos_realizados "
-                + "FROM cobros "
-                + "WHERE id_cliente=" + idCliente
-                + " AND periodo= '" + periodo + "'";
-
-        return consulta(sql);
-    }
-
     public static void insertarPago(
             Date fecha,
             Time hora,
-            int idCliente,
+            int idToma,
             double monto,
             String periodo) throws SQLException {
 
-        String sql = "INSERT INTO cobros (fecha, hora, id_cliente, monto_pagado, periodo)"
+        String sql = "INSERT INTO cobros (fecha, hora, id_toma, monto_pagado, periodo)"
                 + " VALUES ('"
                 + fecha + "','"
                 + hora + "',"
-                + idCliente + ","
+                + idToma + ","
                 + monto + ",'"
                 + periodo + "')";
 
-        System.out.println("" + sql);
         registrar(sql);
     }
 
-    public static List<Mes> obtenerMesesNoPagadosDeUnCliente(int idCliente, String year) {
-        List<String> meses = obtenerMesesHastaActual(year);
-        List<Mes> noPagadosYPagados = new ArrayList<>();
-
-        String sql = "SELECT periodo FROM cobros WHERE id_cliente = ? AND periodo IN ("
-                + String.join(",", meses.stream().map(m -> "?").toArray(String[]::new)) + ")";
-        
-        PreparedStatement stmt;
+    public static ResultSet obtenerMesesNoPagadosDeUnCliente(int idCliente, int year) throws SQLException {
+        String sql = "SELECT m.mes, t.numero_toma, t.id_toma, "
+                + "CASE WHEN c.id IS NOT NULL THEN 'Pagado' ELSE 'No Pagado' END AS estado "
+                + "FROM ( "
+                + "  SELECT LPAD(mes_num, 2, '0') AS mes "
+                + "  FROM (SELECT 1 AS mes_num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 "
+                + "        UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 "
+                + "        UNION SELECT 9 UNION SELECT 10 UNION SELECT 11 UNION SELECT 12) AS meses "
+                + "  WHERE mes_num <= MONTH(CURRENT_DATE()) "
+                + ") AS m "
+                + "CROSS JOIN ( "
+                + "  SELECT id AS id_toma, numero_toma FROM toma WHERE id_cliente = ? "
+                + ") AS t "
+                + "LEFT JOIN cobros c ON c.id_toma = t.id_toma AND c.periodo = CONCAT(?, '-', m.mes)";
+        ResultSet rs = null;
         try {
-            stmt = getStatementConn().getConnection().prepareStatement(sql);
+            PreparedStatement ps = getStatementConn().getConnection().prepareStatement(sql);
+            ps.setInt(1, idCliente);
+            ps.setInt(2, year);
 
-            stmt.setInt(1, idCliente);
-            for (int i = 0; i < meses.size(); i++) {
-                stmt.setString(i + 2, meses.get(i));
-            }
-
-            ResultSet rs = stmt.executeQuery();
-            List<String> pagados = new ArrayList<>();
-            while (rs.next()) {
-                pagados.add(rs.getString("periodo"));
-            }
-
-            for (String mes : meses) {
-                if (!pagados.contains(mes)) {
-                    noPagadosYPagados.add(new Mes(mes, false));
-                }else{
-                    noPagadosYPagados.add(new Mes(mes, true));
-                }
-            }
-
+            rs = ps.executeQuery();
+            return rs;
         } catch (SQLException ex) {
-            System.out.println("Error al obtener meses no pagados " + ex.getMessage());
+            System.err.println("Error al ejecutar consulta sql de obtener pagos y tomas " + ex.getMessage());
         }
-
-        return noPagadosYPagados;
+        return rs;
     }
 
-    public static List<String> obtenerMesesHastaActual(String year) {
-        List<String> meses = new ArrayList<>();
-        int mesActual = java.time.LocalDate.now().getMonthValue();
-
-        for (int i = 1; i <= mesActual; i++) {
-            YearMonth ym = YearMonth.of(Integer.parseInt(year), i);
-            meses.add(ym.format(DateTimeFormatter.ofPattern("yyyy-MM")));
-        }
-
-        return meses;
-    }
-    
-    public static float getMontoMensual(){
-        String sql = "SELECT monto WHERE id=1";
+    public static float getMontoMensual() {
+        String sql = "SELECT monto FROM couta WHERE id=1";
         float monto = 0;
         try {
             ResultSet rs = consulta(sql);
+            rs.next();
             monto = rs.getFloat("monto");
         } catch (SQLException ex) {
-            System.err.println("Error al obtener el monto");
+            System.err.println("Error al obtener el monto " + ex.getMessage());
         }
         return monto;
+    }
+
+    public static String obtenerNombreMes(int numeroMes) {
+        return Month.of(numeroMes).getDisplayName(TextStyle.FULL, new Locale("es"));
+    }
+
+    public static int obtenerNumeroMes(String nombreMes) {
+        for (Month m : Month.values()) {
+            if (m.getDisplayName(TextStyle.FULL, new Locale("es")).equalsIgnoreCase(nombreMes)) {
+                return m.getValue();
+            }
+        }
+        throw new IllegalArgumentException("Nombre de mes inválido: " + nombreMes);
+    }
+
+    public static boolean validarCobroCorrecto(int idToma, int idCliente) {
+        PreparedStatement ps;
+        boolean estado = true;
+        try {
+            ps = getStatementConn().getConnection().prepareStatement("SELECT id FROM toma WHERE id = ? AND id_cliente = ?");
+            ps.setInt(1, idToma);
+            ps.setInt(2, idCliente);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                estado = true;
+            } else {
+                estado = false;
+            }
+        } catch (SQLException ex) {
+            System.out.println("Error al consultar toma de cliente " + ex.getMessage());
+        }
+        return estado;
     }
 }
